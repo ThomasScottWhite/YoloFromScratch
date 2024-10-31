@@ -42,10 +42,6 @@ class Yolov1(nn.Module):
         self.darknet = self._create_conv_layers(self.architecture)
         self.fcs = self._create_fcs(**kwargs)
 
-    def forward(self, x):
-        x = self.darknet(x)
-        return self.fcs(torch.flatten(x, start_dim=1))
-
     def _create_conv_layers(self, architecture):
         layers = []
         in_channels = self.in_channels
@@ -104,6 +100,11 @@ class Yolov1(nn.Module):
             nn.LeakyReLU(negative_slope=0.1),
             nn.Linear(496, split_size * split_size * (num_classes + num_boxes * 5)),
         )
+    
+    def forward(self, x):
+        x = self.darknet(x)
+        return self.fcs(torch.flatten(x, start_dim=1))
+
 
 
 def test(split_size=7, num_boxes=2, num_classes=20):
